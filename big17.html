@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MRIDUL 17 — Pool Party</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,500;1,400&family=Jost:wght@300;400;500;700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;background:#050505;overflow:hidden;font-family:'Jost',sans-serif;}
+
+.stage{position:relative;width:100%;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#050505;}
+.stage.shake{animation:shake 0.4s ease;}
+@keyframes shake{
+0%,100%{transform:translate(0,0);}
+20%{transform:translate(-6px,3px);}
+40%{transform:translate(6px,-3px);}
+60%{transform:translate(-4px,2px);}
+80%{transform:translate(4px,-2px);}
+}
+
+.flash{position:absolute;inset:0;background:#fff;z-index:50;animation:flashOut 0.6s ease forwards 0.15s;pointer-events:none;}
+@keyframes flashOut{ to{ opacity:0; visibility:hidden; } }
+
+.glow{position:absolute;inset:-20%;z-index:0;
+background:
+radial-gradient(circle at 25% 30%, rgba(255,45,120,0.22), transparent 32%),
+radial-gradient(circle at 75% 70%, rgba(255,207,64,0.18), transparent 32%),
+radial-gradient(circle at 50% 90%, rgba(64,200,255,0.14), transparent 30%);
+filter:blur(40px);
+animation:drift 12s ease-in-out infinite alternate;
+}
+@keyframes drift{ from{ transform:translate(0,0) scale(1);} to{ transform:translate(-3%,4%) scale(1.14);} }
+
+.pool-glow{position:absolute;bottom:-30%;left:50%;width:140%;height:60%;transform:translateX(-50%);
+background:radial-gradient(ellipse at center, rgba(64,200,255,0.28), transparent 60%);
+animation:pulse 3.5s ease-in-out infinite;z-index:0;}
+@keyframes pulse{0%,100%{opacity:0.6;}50%{opacity:1;}}
+
+.frame{position:absolute;inset:24px;border:1px solid rgba(255,207,64,0.35);z-index:2;pointer-events:none;}
+.frame::before,.frame::after{content:'';position:absolute;width:22px;height:22px;border:2px solid #ffcf40;}
+.frame::before{top:-2px;left:-2px;border-right:none;border-bottom:none;}
+.frame::after{bottom:-2px;right:-2px;border-left:none;border-top:none;}
+
+.content{position:relative;z-index:3;text-align:center;color:#f2f2f2;padding:0 24px;max-width:680px;}
+
+.scene{display:none;}
+.scene.active{display:block;animation:fadeUp 0.5s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+.eyebrow{font-size:12px;letter-spacing:6px;text-transform:uppercase;color:#40c8ff;margin-bottom:14px;}
+.badge{display:inline-block;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#050505;
+background:linear-gradient(100deg,#ffcf40,#ff2d78);padding:5px 14px;border-radius:20px;margin-bottom:16px;font-weight:700;}
+
+.hype{font-family:'Jost',sans-serif;font-weight:700;font-size:clamp(20px,4vw,30px);line-height:1.4;letter-spacing:0.5px;max-width:540px;margin:0 auto;}
+.hype span{display:block;opacity:0;animation:lineIn 0.5s ease forwards;}
+.hype span:nth-child(1){animation-delay:0.1s;}
+.hype span:nth-child(2){animation-delay:0.55s;color:#ffcf40;}
+.hype span:nth-child(3){animation-delay:1.0s;color:#ff2d78;}
+@keyframes lineIn{from{opacity:0;transform:translateY(10px) scale(0.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+.storytext{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(18px,3vw,24px);line-height:1.6;color:#e8e8e8;max-width:520px;margin:0 auto;}
+
+.name{font-family:'Bebas Neue',sans-serif;font-size:clamp(90px,20vw,190px);line-height:0.85;letter-spacing:4px;
+background:linear-gradient(100deg,#ffe9a8 10%,#ffcf40 35%,#ff2d78 60%,#ffcf40 85%);
+background-size:280% 100%;
+-webkit-background-clip:text;background-clip:text;color:transparent;
+text-shadow:0 0 60px rgba(255,45,120,0.35);
+animation:shine 4s linear infinite;
+margin:6px 0 0;
+position:relative;
+}
+@keyframes shine{ to{ background-position:-280% 0; } }
+.name::before{
+content:'MRIDUL';
+position:absolute; left:0; top:0; width:100%;
+color:#40c8ff; opacity:0; z-index:-1;
+-webkit-text-fill-color:#40c8ff;
+animation:glitch 3s steps(2) infinite;
+}
+@keyframes glitch{
+0%,92%{ opacity:0; transform:translate(0,0); }
+93%{ opacity:0.7; transform:translate(3px,-2px); }
+94%{ opacity:0.4; transform:translate(-3px,1px); }
+95%{ opacity:0; transform:translate(0,0); }
+}
+
+.turning{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(20px,3.6vw,30px);margin-top:2px;}
+.turning b{font-style:normal;color:#ffcf40;font-weight:700;}
+
+.tagline{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:#ffb3cd;margin-top:10px;}
+
+.divider{width:80px;height:2px;margin:24px auto;background:linear-gradient(90deg,transparent,#ff2d78,#ffcf40,transparent);}
+
+.rumor{font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.6vw,22px);color:#f2f2f2;max-width:500px;margin:12px auto 0;line-height:1.6;}
+
+.details{display:flex;justify-content:center;gap:38px;margin-top:34px;flex-wrap:wrap;}
+.detail .label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#ff2d78;margin-bottom:6px;}
+.detail .value{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;color:#fff;}
+
+.note{margin-top:32px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px;color:#ffcf40;}
+.subnote{margin-top:8px;font-size:12px;letter-spacing:1px;color:#40c8ff;text-transform:uppercase;}
+
+.btn{margin-top:30px;background:transparent;border:1px solid #ffcf40;color:#ffe9a8;padding:12px 28px;
+border-radius:30px;font-family:'Jost',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;
+cursor:pointer;transition:all 0.25s ease;font-weight:500;}
+.btn:hover{background:#ffcf40;color:#050505;box-shadow:0 0 24px rgba(255,207,64,0.5);}
+.btn.alt{border-color:#ff2d78;color:#ffb3cd;}
+.btn.alt:hover{background:#ff2d78;color:#050505;box-shadow:0 0 24px rgba(255,45,120,0.5);}
+
+#drops{position:absolute;inset:0;z-index:4;pointer-events:none;}
+@keyframes fallDrop{from{transform:translateY(-10px);opacity:1;}to{transform:translateY(100vh);opacity:0;}}
+
+.water{position:absolute;bottom:0;left:0;right:0;height:140px;overflow:hidden;z-index:1;}
+.water svg{position:absolute;bottom:-10px;width:200%;height:100%;}
+.wave1{animation:waveMove 8s linear infinite;opacity:0.5;}
+.wave2{animation:waveMove 13s linear infinite reverse;opacity:0.3;}
+@keyframes waveMove{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+@media (max-width:480px){ .details{ gap:22px; } }
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+  <div class="flash"></div>
+  <div class="glow"></div>
+  <div class="pool-glow"></div>
+  <div class="frame"></div>
+  <div id="drops"></div>
+
+  <div class="content">
+
+    <div class="scene active" data-scene="0">
+      <div class="badge">Breaking news, Kanke</div>
+      <div class="hype">
+        <span>Someone just declared war on boring birthdays.</span>
+        <span>The evidence washed up at Kanke Resort.</span>
+        <span>You're a suspect. Come find out why.</span>
+      </div>
+      <button class="btn" onclick="nextScene()">Investigate</button>
+    </div>
+
+    <div class="scene" data-scene="1">
+      <div class="eyebrow">The tide brought a name</div>
+      <div class="name"></div>
+      <div class="turning">is turning <b>17</b></div>
+      <div class="tagline">and has never once entered a room quietly</div>
+      <button class="btn" onclick="nextScene()">Tell me everything</button>
+    </div>
+
+    <div class="scene" data-scene="2">
+      <div class="eyebrow">Rumor has it</div>
+      <div class="rumor" id="rumorLine"></div>
+      <div class="divider"></div>
+      <button class="btn" onclick="nextScene()">Where and when</button>
+    </div>
+
+    <div class="scene" data-scene="3">
+      <div class="eyebrow">Pool Party</div>
+      <div class="details">
+        <div class="detail"><div class="label">Date</div><div class="value">17 JULY</div></div>
+        <div class="detail"><div class="label">Time</div><div class="value">3:00 PM</div></div>
+        <div class="detail"><div class="label">Venue</div><div class="value">KANKE RESORT</div></div>
+      </div>
+      <div class="note">Bring swim shorts. Leave your chill at home.</div>
+      <div class="subnote">Dry clothes are optional. Showing up is not.</div>
+      <button class="btn alt" onclick="makeSplash()">Detonate the invite</button>
+    </div>
+
+  </div>
+
+  <div class="water">
+    <svg class="wave1" viewBox="0 0 1600 130" preserveAspectRatio="none"><path d="M0,60 C200,110 400,10 600,60 C800,110 1000,10 1200,60 C1400,110 1600,10 1800,60 L1800,130 L0,130 Z" fill="#40c8ff"></path></svg>
+    <svg class="wave2" viewBox="0 0 1600 130" preserveAspectRatio="none"><path d="M0,80 C200,30 400,130 600,80 C800,30 1000,130 1200,80 C1400,30 1600,130 1800,80 L1800,130 L0,130 Z" fill="#ff2d78"></path></svg>
+  </div>
+</div>
+
+<script>
+var rumors=[
+"There's talk of a cannonball contest. The reigning champion isn't backing down without a fight.",
+"Word is the birthday boy has a surprise planned, and it involves the deep end with zero warning.",
+"Someone mentioned a floating snack bar. Nobody's confirmed it. Everybody's hoping it's true.",
+"Apparently the playlist only takes requests from people who are already wet.",
+"Sources say there's a trophy involved. Nobody knows for what. Everybody wants it."
+];
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+
+function typeName(){
+  var el=document.querySelector('.name');
+  var text='MRIDUL';
+  el.textContent='';
+  var i=0;
+  var iv=setInterval(function(){
+    el.textContent+=text[i];
+    i++;
+    if(i>=text.length){ clearInterval(iv); }
+  },90);
+}
+
+function nextScene(){
+  var scenes=document.querySelectorAll('.scene');
+  var current=-1;
+  scenes.forEach(function(s,i){ if(s.classList.contains('active')) current=i; });
+  if(current===1){ document.getElementById('rumorLine').textContent = pick(rumors); }
+  if(current<scenes.length-1){
+    scenes[current].classList.remove('active');
+    scenes[current+1].classList.add('active');
+    if(current+1===1){ typeName(); }
+  }
+}
+
+function makeSplash(){
+  var stage=document.getElementById('stage');
+  stage.classList.remove('shake');
+  void stage.offsetWidth;
+  stage.classList.add('shake');
+
+  var container=document.getElementById('drops');
+  var colors=['#40c8ff','#ffcf40','#ff2d78'];
+  var count=16+Math.floor(Math.random()*12);
+  for(var i=0;i<count;i++){
+    (function(){
+      var d=document.createElement('div');
+      var x=Math.random()*100;
+      var delay=Math.random()*0.7;
+      var duration=1+Math.random()*1.1;
+      var size=3+Math.random()*5;
+      d.style.position='absolute';
+      d.style.left=x+'%';
+      d.style.top='0';
+      d.style.width=size+'px';
+      d.style.height=(size*2.2)+'px';
+      d.style.borderRadius='50% 50% 50% 50% / 60% 60% 40% 40%';
+      d.style.background=colors[Math.floor(Math.random()*colors.length)];
+      d.style.opacity='0.85';
+      d.style.animation='fallDrop '+duration+'s ease-in '+delay+'s forwards';
+      container.appendChild(d);
+      setTimeout(function(){ d.remove(); }, (duration+delay)*1000+100);
+    })();
+  }
+}
+</script>
+
+</body>
+</html>
